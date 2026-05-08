@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Search, 
   Bell, 
@@ -14,6 +14,47 @@ export default function Navbar({ toggleSidebar, darkMode, toggleDarkMode }) {
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [messageOpen, setMessageOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+
+  const notificationRef = useRef(null);
+  const messageRef = useRef(null);
+  const userMenuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (notificationRef.current && !notificationRef.current.contains(event.target)) {
+        setNotificationOpen(false);
+      }
+      if (messageRef.current && !messageRef.current.contains(event.target)) {
+        setMessageOpen(false);
+      }
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setUserMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const toggleMessage = () => {
+    setMessageOpen(!messageOpen);
+    setNotificationOpen(false);
+    setUserMenuOpen(false);
+  };
+
+  const toggleNotification = () => {
+    setNotificationOpen(!notificationOpen);
+    setMessageOpen(false);
+    setUserMenuOpen(false);
+  };
+
+  const toggleUserMenu = () => {
+    setUserMenuOpen(!userMenuOpen);
+    setNotificationOpen(false);
+    setMessageOpen(false);
+  };
 
   return (
     <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
@@ -44,9 +85,9 @@ export default function Navbar({ toggleSidebar, darkMode, toggleDarkMode }) {
           </button>
 
           {/* Messages */}
-          <div className="relative">
+          <div className="relative" ref={messageRef}>
             <button
-              onClick={() => setMessageOpen(!messageOpen)}
+              onClick={toggleMessage}
               className="relative p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
             >
               <MessageSquare className="w-5 h-5" />
@@ -112,9 +153,9 @@ export default function Navbar({ toggleSidebar, darkMode, toggleDarkMode }) {
           </div>
 
           {/* Notifications */}
-          <div className="relative">
+          <div className="relative" ref={notificationRef}>
             <button
-              onClick={() => setNotificationOpen(!notificationOpen)}
+              onClick={toggleNotification}
               className="relative p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
             >
               <Bell className="w-5 h-5" />
@@ -141,9 +182,9 @@ export default function Navbar({ toggleSidebar, darkMode, toggleDarkMode }) {
           </div>
 
           {/* User menu */}
-          <div className="relative">
+          <div className="relative" ref={userMenuRef}>
             <button
-              onClick={() => setUserMenuOpen(!userMenuOpen)}
+              onClick={toggleUserMenu}
               className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
             >
               <img
